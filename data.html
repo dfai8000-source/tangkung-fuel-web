@@ -21,7 +21,15 @@
   .k{color:var(--muted)} .v{font-weight:bold}
   .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#9E9E9E;margin-right:6px}
   .dot.ok{background:#2E7D32}.dot.bad{background:#C62828}
-  img.chart{width:100%;border-radius:14px;border:1px solid var(--line);background:#fff}
+  #tvchart{width:100%;height:420px}
+  @media (max-width:640px){#tvchart{height:300px}}
+  .tfrow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .tfbtns{display:flex;gap:6px}
+  .tfbtns button{border:1px solid var(--line);background:var(--cream);color:var(--brown);font-size:13px;font-weight:bold;padding:6px 12px;border-radius:16px;cursor:pointer;font-family:inherit}
+  .tfbtns button.on{background:var(--gold);border-color:var(--gold)}
+  .tlegend{font-size:13px;color:var(--muted)}
+  .tlegend b{color:var(--brown)}
+  .chartnote{font-size:12px;color:var(--muted);margin-top:8px}
   table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:14px;overflow:hidden}
   th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line)}
   th:first-child,td:first-child{text-align:left}
@@ -48,8 +56,73 @@
   <h2>สถานะ pipeline</h2>
   <div class="card" id="statuscard"><div class="sub">กำลังโหลด…</div></div>
 
-  <h2>ราคาแก๊สโซฮอล์ 95 ย้อนหลัง 1 ปี</h2>
-  <img class="chart" src="data/chart_1y.png" alt="กราฟ 1 ปี">
+  <h2>ราคาแก๊สโซฮอล์ 95 ย้อนหลัง</h2>
+  <div class="card">
+    <div class="tfrow">
+      <div class="tfbtns" id="tfbtns">
+        <button data-days="90">3M</button>
+        <button data-days="180">6M</button>
+        <button data-days="365" class="on">1Y</button>
+        <button data-days="0">ทั้งหมด</button>
+      </div>
+      <div class="tlegend" id="tlegend">กำลังโหลด…</div>
+    </div>
+    <div id="tvchart"></div>
+    <div class="chartnote">แตะ/ลากบนกราฟเพื่อดูราคาแต่ละวัน • เส้นประ = ค่าเฉลี่ย 30 วัน (MA30) • ที่มา: บางจาก</div>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+(function(){
+  const el=document.getElementById('tvchart'), leg=document.getElementById('tlegend');
+  const THM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  function fdate(iso){const p=iso.split('-').map(Number);return p[2]+' '+THM[p[1]-1]+' '+((p[0]+543)%100);}
+  function fval(v){return (v==null||v===undefined)?'–':v.toFixed(2);}
+  if(!window.LightweightCharts){leg.textContent='โหลดไลบรารีกราฟไม่สำเร็จ (ต้องต่ออินเทอร์เน็ต)';return;}
+  const chart=LightweightCharts.createChart(el,{
+    width:el.clientWidth, height:el.clientHeight||420,
+    layout:{background:{type:'solid',color:'#ffffff'},textColor:'#8D6E63',fontSize:12,
+      fontFamily:"-apple-system,'Leelawadee UI','Segoe UI',Tahoma,sans-serif"},
+    grid:{vertLines:{color:'#F7EFDC'},horzLines:{color:'#F7EFDC'}},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,
+      vertLine:{color:'#E2AE3D',labelBackgroundColor:'#E2AE3D'},
+      horzLine:{color:'#E2AE3D',labelBackgroundColor:'#E2AE3D'}},
+    rightPriceScale:{borderColor:'#EAD9AE'},
+    timeScale:{borderColor:'#EAD9AE',timeVisible:false,tickMarkFormatter:function(t){return fdate(t);}}
+  });
+  const area=chart.addAreaSeries({title:'กส 95',lineColor:'#E2AE3D',lineWidth:2,
+    topColor:'rgba(226,174,61,0.35)',bottomColor:'rgba(226,174,61,0.03)'});
+  const ma=chart.addLineSeries({title:'MA30',color:'#8D6E63',lineWidth:1,
+    lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+  let full=[];
+  function showLast(){const l=full[full.length-1];
+    leg.innerHTML='กส 95 <b>'+fval(l.p)+'</b> • MA30 <b>'+fval(l.m)+'</b> • '+fdate(l.t);}
+  function setRange(days){
+    const w=days>0?full.slice(-days):full.slice();
+    area.setData(w.map(function(r){return {time:r.t,value:r.p};}));
+    ma.setData(w.map(function(r){return {time:r.t,value:r.m};}));
+    let hi=w[0],lo=w[0];
+    w.forEach(function(r){if(r.p>hi.p)hi=r;if(r.p<lo.p)lo=r;});
+    area.setMarkers([
+      {time:hi.t,position:'aboveBar',color:'#C62828',shape:'arrowDown',text:'สูงสุด '+hi.p.toFixed(2)},
+      {time:lo.t,position:'belowBar',color:'#2E7D32',shape:'arrowUp',text:'ต่ำสุด '+lo.p.toFixed(2)}
+    ]);
+    chart.timeScale().fitContent(); showLast();
+  }
+  chart.subscribeCrosshairMove(function(p){
+    if(!p||!p.time||!p.seriesData){showLast();return;}
+    const a=p.seriesData.get(area), m=p.seriesData.get(ma);
+    leg.innerHTML='กส 95 <b>'+fval(a&&a.value)+'</b> • MA30 <b>'+fval(m&&m.value)+'</b> • '+fdate(p.time);
+  });
+  document.getElementById('tfbtns').addEventListener('click',function(e){
+    const b=e.target.closest('button'); if(!b)return;
+    document.querySelectorAll('#tfbtns button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on'); setRange(parseInt(b.dataset.days,10));
+  });
+  new ResizeObserver(function(){chart.applyOptions({width:el.clientWidth});}).observe(el);
+  fetch('data/chart_full.json').then(function(r){return r.json();}).then(function(j){full=j;setRange(365);})
+    .catch(function(){leg.textContent='โหลดข้อมูลกราฟไม่ได้';});
+})();
+</script>
 
   <h2>ราคาปั๊ม 30 วันล่าสุด</h2>
   <table>
