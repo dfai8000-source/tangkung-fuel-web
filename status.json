@@ -1,11 +1,11 @@
 {
- "updated_at": "2026-09-28 18:16",
+ "updated_at": "2026-09-28 18:40",
  "pump_date": "2026-09-24",
  "brent_asof": "2026-09-25",
  "brent_close": 104.32,
  "scenario": "R2",
- "title": "ยังไม่ต้องเต็มถัง",
+ "title": "ยังไม่ต้องเติมเต็มถังก็ได้",
  "g95": 39.94,
  "ok": true,
- "push_ok": true
+ "push_ok": null
 }
