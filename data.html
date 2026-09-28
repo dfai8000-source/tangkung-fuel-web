@@ -74,7 +74,7 @@
         <button data-lb="30">30</button>
         <button data-lb="60" class="on">60</button>
       </div>
-      <div class="tfbtns"><button id="maToggle" class="on">MA30</button></div>
+      <div class="tfbtns"><button id="maToggle">MA30</button></div>
     </div>
     <div id="tvchart"></div>
     <div class="chartnote">แตะ/ลากบนกราฟเพื่อดูราคาแต่ละวัน • เส้นประทอง = MA30 • Bollinger: เส้นทึบเทา = 2SD, เส้นประอ่อน = 1SD • ที่มา: บางจาก</div>
@@ -100,7 +100,7 @@
   });
   const area=chart.addAreaSeries({title:'กส 95',lineColor:'#E2AE3D',lineWidth:2,
     topColor:'rgba(226,174,61,0.35)',bottomColor:'rgba(226,174,61,0.03)'});
-  const ma30=chart.addLineSeries({title:'MA30',color:'#8D6E63',lineWidth:1,
+  const ma30=chart.addLineSeries({title:'MA30',color:'#8D6E63',lineWidth:1,visible:false,
     lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
   const bbMid=chart.addLineSeries({title:'BB mid',color:'#5D4037',lineWidth:1,
     priceLineVisible:false,lastValueVisible:false});
@@ -113,7 +113,7 @@
   const bbL1=chart.addLineSeries({title:'BB 1SD-',color:'#B9C9D2',lineWidth:1,
     lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
   const BB=[bbMid,bbU2,bbL2,bbU1,bbL1];
-  let full=[], bbN=60, bb={u2:[],u1:[],mid:[],l1:[],l2:[]}, bbOn=true, maOn=true, curDays=365;
+  let full=[], bbN=60, bb={u2:[],u1:[],mid:[],l1:[],l2:[]}, bbOn=true, maOn=false, curDays=365;
   function computeBB(n){
     bbN=n; const u2=[],u1=[],mid=[],l1=[],l2=[];
     let s=0,s2=0;
