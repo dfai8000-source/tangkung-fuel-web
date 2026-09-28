@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>หลังบ้าน — ตังคุง Daily</title>
+<style>
+  :root{--cream:#FFF8E7;--brown:#3E2723;--gold:#E2AE3D;--muted:#8D6E63;--line:#EAD9AE}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,'Leelawadee UI','Segoe UI',Tahoma,sans-serif;background:var(--cream);color:var(--brown);margin:0;padding:0}
+  .wrap{max-width:640px;margin:0 auto;padding:16px}
+  nav{display:flex;gap:8px;padding:12px 16px;background:var(--brown);position:sticky;top:0;z-index:10}
+  nav a{color:#FFE9B8;text-decoration:none;font-size:14px;font-weight:bold;padding:8px 14px;border-radius:20px}
+  nav a.on{background:var(--gold);color:var(--brown)}
+  h1{font-size:20px;margin:14px 0 4px}
+  h2{font-size:16px;margin:22px 0 8px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+  .row{display:flex;justify-content:space-between;font-size:14px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .row:last-child{border-bottom:0}
+  .k{color:var(--muted)} .v{font-weight:bold}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#9E9E9E;margin-right:6px}
+  .dot.ok{background:#2E7D32}.dot.bad{background:#C62828}
+  img.chart{width:100%;border-radius:14px;border:1px solid var(--line);background:#fff}
+  table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:14px;overflow:hidden}
+  th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  th{background:var(--brown);color:#FFE9B8;font-size:12px}
+  .up{color:#C62828;font-weight:bold}.dn{color:#2E7D32;font-weight:bold}.flat{color:var(--muted)}
+  .howto{font-size:14px;line-height:1.8}
+  .howto b{color:var(--brown)}
+  .step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:14px;line-height:1.7}
+  .step .t{font-weight:bold;margin-bottom:2px}
+  .warn{background:#FFF3E0;border:1px solid #FFCC80;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.7;margin-top:12px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html">📮 โพสต์วันนี้</a>
+  <a href="history.html">🗂️ คลังโพสต์</a>
+  <a href="data.html" class="on">🔧 หลังบ้าน</a>
+</nav>
+<div class="wrap">
+  <h1>🔧 หลังบ้าน</h1>
+  <div class="sub">สุขภาพข้อมูลและ pipeline — สำหรับคนดูแลระบบ (คือ Muse เอง 😄)</div>
+
+  <h2>สถานะ pipeline</h2>
+  <div class="card" id="statuscard"><div class="sub">กำลังโหลด…</div></div>
+
+  <h2>ราคาแก๊สโซฮอล์ 95 ย้อนหลัง 1 ปี</h2>
+  <img class="chart" src="data/chart_1y.png" alt="กราฟ 1 ปี">
+
+  <h2>ราคาปั๊ม 30 วันล่าสุด</h2>
+  <table>
+    <thead><tr><th>วันที่</th><th>กส 95 (บ./ล.)</th><th>เปลี่ยน</th></tr></thead>
+    <tbody id="tbody"><tr><td colspan="3" style="text-align:center;color:var(--muted)">กำลังโหลด…</td></tr></tbody>
+  </table>
+
+  <h2>หลังบ้านทำงานอย่างไร</h2>
+  <div class="howto">
+    <div class="step"><div class="t">🕖 19:00 — กวาดราคาปั๊ม</div>ดึงราคาหน้าปั๊มจากเว็บ<b>บางจาก</b> (ข้อมูลสาธารณะ) บันทึกลงฐานข้อมูล ถ้าดึงไม่ได้จะลองใหม่แล้วแจ้งเตือน</div>
+    <div class="step"><div class="t">🕢 19:20 — คำนวณ + สร้างโพสต์</div>ดึงราคา <b>Brent</b> จาก Yahoo Finance แล้วคำนวณสัญญาณ 5 วัน วาดรูป 1080×1080 เขียน caption 5 แบบตาม scenario อัปโหลดขึ้นเว็บนี้อัตโนมัติ</div>
+    <div class="step"><div class="t">🕗 20:00 — เฝ้ามาตรการรัฐ</div>ตรวจข่าวกองทุนน้ำมัน/มาตรการรัฐ ถ้ามีแววลดราคาจะร่าง alert ให้อนุมัติก่อนราคามีผลตี 5</div>
+    <div class="step"><div class="t">📱 หน้าที่ของ Earth</div><b>เปิดเว็บนี้ทุกเย็น</b> → ดาวน์โหลดรูป → คัดลอก caption → โพสต์ลงเพจ แค่นั้น ที่เหลือระบบจัดการเอง</div>
+  </div>
+  <div class="warn">⚠️ <b>ข้อควรรู้:</b> สัญญาณ Brent ใช้<i>แท่งราคาที่ปิดแล้ว</i>เท่านั้น (ไม่ใช้แท่งที่กำลังวิ่ง) โพสต์ที่ออกไปแล้วจะไม่เปลี่ยนคำตัดสินย้อนหลัง • ความแม่นยำสัญญาณ ~60% ไม่ใช่ 100% • ถ้าหน้าสถานะขึ้นสีแดง แจ้ง Muse ได้เลย</div>
+  <div class="sub" style="text-align:center;margin-top:20px">ตังคุง Daily • Technical Analysis Adaptation on Real Life</div>
+</div>
+<script>
+const THM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function thd(iso){ if(!iso) return '–'; const [y,m,d]=iso.split('-').map(Number);
+  return `${d} ${THM[m-1]} ${(y+543)%100}`; }
+async function load(){
+  try{
+    const s = await (await fetch('status.json')).json();
+    const ok = s.ok && s.push_ok !== false;
+    document.getElementById('statuscard').innerHTML = `
+      <div class="row"><span class="k"><span class="dot ${ok?'ok':'bad'}"></span>สถานะรวม</span><span class="v">${ok?'ปกติ ✅':'มีปัญหา ⚠️'}</span></div>
+      <div class="row"><span class="k">รันล่าสุด</span><span class="v">${s.updated_at} น.</span></div>
+      <div class="row"><span class="k">ข้อมูลปั๊มถึงวันที่</span><span class="v">${thd(s.pump_date)}</span></div>
+      <div class="row"><span class="k">Brent (แท่งปิด ${thd(s.brent_asof)})</span><span class="v">$${s.brent_close}</span></div>
+      <div class="row"><span class="k">Scenario ล่าสุด</span><span class="v">${s.title}</span></div>
+      <div class="row"><span class="k">Push ขึ้น Vercel</span><span class="v">${s.push_ok===true?'สำเร็จ':s.push_ok===false?'ล้มเหลว':'รอผล'}</span></div>`;
+  }catch(e){ document.getElementById('statuscard').innerHTML='<div class="sub">โหลดสถานะไม่ได้</div>'; }
+  try{
+    const rows = await (await fetch('data/recent.json')).json();
+    document.getElementById('tbody').innerHTML = rows.map(r=>{
+      const c = r.chg > 0 ? 'up' : r.chg < 0 ? 'dn' : 'flat';
+      const t = r.chg > 0 ? '▲' : r.chg < 0 ? '▼' : '–';
+      return `<tr><td>${thd(r.date)}</td><td>${r.g95.toFixed(2)}</td><td class="${c}">${t} ${Math.abs(r.chg).toFixed(2)}</td></tr>`;
+    }).join('');
+  }catch(e){}
+}
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ตังคุง Daily — มิเตอร์น้ำมัน</title>
+<style>
+  :root{--cream:#FFF8E7;--brown:#3E2723;--gold:#E2AE3D;--muted:#8D6E63;--line:#EAD9AE}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,'Leelawadee UI','Segoe UI',Tahoma,sans-serif;background:var(--cream);color:var(--brown);margin:0;padding:0}
+  .wrap{max-width:640px;margin:0 auto;padding:16px}
+  nav{display:flex;gap:8px;padding:12px 16px;background:var(--brown);position:sticky;top:0;z-index:10}
+  nav a{color:#FFE9B8;text-decoration:none;font-size:14px;font-weight:bold;padding:8px 14px;border-radius:20px}
+  nav a.on{background:var(--gold);color:var(--brown)}
+  header{display:flex;align-items:center;gap:12px;padding:14px 0 12px;border-bottom:3px solid var(--gold);margin-bottom:12px}
+  header img{width:64px;height:64px;object-fit:contain}
+  .pill{background:var(--brown);color:#fff;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:bold;display:inline-block}
+  h1{font-size:22px;margin:6px 0 0}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .status{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:12px}
+  .dot{width:10px;height:10px;border-radius:50%;background:#9E9E9E;flex:none}
+  .dot.ok{background:#2E7D32}.dot.bad{background:#C62828}
+  .postimg{width:100%;border-radius:16px;box-shadow:0 4px 18px rgba(62,39,35,.15);display:block}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:13px}
+  .capbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:6px}
+  .capbox h3{margin:0 0 8px;font-size:15px}
+  pre{white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.6;margin:0}
+  button{background:var(--brown);color:#fff;border:0;border-radius:12px;padding:13px 18px;font-size:15px;font-weight:bold;width:100%;margin-top:12px;cursor:pointer}
+  button:active{transform:scale(.98)}
+  a.imgdl{display:block;text-align:center;margin:12px 0 4px;color:var(--brown);font-size:15px;font-weight:bold;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px}
+  .note{color:var(--muted);font-size:12px;text-align:center;margin:18px 0 8px;line-height:1.6}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="on">📮 โพสต์วันนี้</a>
+  <a href="history.html">🗂️ คลังโพสต์</a>
+  <a href="data.html">🔧 หลังบ้าน</a>
+</nav>
+<div class="wrap">
+<header>
+  <img src="assets/coiny.png" alt="ตังคุง">
+  <div>
+    <span class="pill">ตังคุง Daily</span>
+    <h1>มิเตอร์น้ำมันประจำวัน</h1>
+    <div class="sub" id="dateline">กำลังโหลด…</div>
+  </div>
+</header>
+
+<div class="status"><span class="dot" id="dot"></span><span id="statustext">กำลังตรวจสอบสถานะ…</span></div>
+
+<img class="postimg" src="latest/post.png" alt="มิเตอร์น้ำมันประจำวัน">
+<a class="imgdl" href="latest/post.png" download="tangkung-fuel.png">⬇️ ดาวน์โหลดรูป</a>
+
+<div class="chips" id="chips"></div>
+
+<div class="capbox">
+  <h3>📝 Caption สำหรับโพสต์</h3>
+  <pre id="caption">กำลังโหลด…</pre>
+  <button onclick="copyCap()">คัดลอก Caption</button>
+</div>
+
+<p class="note">ระบบสร้างอัตโนมัติทุกเย็น ~19:20 น.<br>⚠️ ตรวจสอบรูป + caption ก่อนกดโพสต์ลงเพจทุกครั้ง</p>
+</div>
+
+<script>
+const THM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function thd(iso){ if(!iso) return '–'; const [y,m,d]=iso.split('-').map(Number);
+  return `${d} ${THM[m-1]} ${(y+543)%100}`; }
+async function load(){
+  try{
+    const m = await (await fetch('latest/meta.json')).json();
+    document.getElementById('dateline').textContent =
+      `ข้อมูลปั๊ม ${thd(m.date)} • Brent 5 วัน ${(m.brent_r5*100).toFixed(2)}%`;
+    const chip = (t)=>`<span class="chip">${t}</span>`;
+    document.getElementById('chips').innerHTML =
+      chip('🎯 '+m.title) + chip('⛽ '+m.g95.toFixed(2)+' บาท/ลิตร') + chip('📍 '+m.zone);
+  }catch(e){}
+  try{
+    const c = await (await fetch('latest/caption.txt')).text();
+    document.getElementById('caption').textContent = c;
+  }catch(e){ document.getElementById('caption').textContent = 'โหลด caption ไม่ได้'; }
+  try{
+    const s = await (await fetch('status.json')).json();
+    const ok = s.ok && s.push_ok !== false;
+    document.getElementById('dot').className = 'dot ' + (ok ? 'ok' : 'bad');
+    document.getElementById('statustext').textContent =
+      `อัปเดตล่าสุด ${s.updated_at} น. • ปั๊ม ${thd(s.pump_date)} • Brent ปิด ${thd(s.brent_asof)}` +
+      (s.push_ok === false ? ' • ⚠️ push ขึ้น Vercel ไม่สำเร็จ' : '');
+  }catch(e){ document.getElementById('statustext').textContent = 'ยังไม่มีข้อมูลสถานะ'; }
+}
+function copyCap(){
+  const t = document.getElementById('caption').textContent;
+  navigator.clipboard.writeText(t).then(()=>alert('คัดลอก caption แล้ว ✅'));
+}
+load();
+</script>
+</body>
+</html>

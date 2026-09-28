@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คลังโพสต์ — ตังคุง Daily</title>
+<style>
+  :root{--cream:#FFF8E7;--brown:#3E2723;--gold:#E2AE3D;--muted:#8D6E63;--line:#EAD9AE}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,'Leelawadee UI','Segoe UI',Tahoma,sans-serif;background:var(--cream);color:var(--brown);margin:0;padding:0}
+  .wrap{max-width:640px;margin:0 auto;padding:16px}
+  nav{display:flex;gap:8px;padding:12px 16px;background:var(--brown);position:sticky;top:0;z-index:10}
+  nav a{color:#FFE9B8;text-decoration:none;font-size:14px;font-weight:bold;padding:8px 14px;border-radius:20px}
+  nav a.on{background:var(--gold);color:var(--brown)}
+  h1{font-size:20px;margin:14px 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer}
+  .card img{width:100%;display:block;aspect-ratio:1;object-fit:cover}
+  .card .meta{padding:10px 12px}
+  .card .d{font-weight:bold;font-size:14px}
+  .card .t{font-size:12px;color:var(--muted);margin-top:2px}
+  .sc{display:inline-block;font-size:11px;font-weight:bold;border-radius:10px;padding:2px 8px;margin-top:6px;color:#fff}
+  .sc.G{background:#2E7D32}.sc.Y{background:#D99A2B}.sc.R{background:#C62828}
+  #detail{display:none}
+  #detail img{width:100%;border-radius:16px;box-shadow:0 4px 18px rgba(62,39,35,.15)}
+  .capbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+  .capbox h3{margin:0 0 8px;font-size:15px}
+  pre{white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.6;margin:0}
+  button{background:var(--brown);color:#fff;border:0;border-radius:12px;padding:13px 18px;font-size:15px;font-weight:bold;width:100%;margin-top:12px;cursor:pointer}
+  button.ghost{background:#fff;color:var(--brown);border:1px solid var(--line)}
+  a.imgdl{display:block;text-align:center;margin:12px 0 4px;color:var(--brown);font-size:15px;font-weight:bold;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px}
+  .empty{color:var(--muted);text-align:center;padding:40px 0}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html">📮 โพสต์วันนี้</a>
+  <a href="history.html" class="on">🗂️ คลังโพสต์</a>
+  <a href="data.html">🔧 หลังบ้าน</a>
+</nav>
+<div class="wrap">
+  <div id="list">
+    <h1>🗂️ คลังโพสต์ย้อนหลัง</h1>
+    <div class="sub">กดที่รูปเพื่อดูภาพเต็ม + caption ของวันนั้น</div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="detail">
+    <button class="ghost" onclick="back()">← กลับไปคลังโพสต์</button>
+    <h1 id="dtitle"></h1>
+    <div class="sub" id="dsub"></div>
+    <img id="dimg" alt="โพสต์ย้อนหลัง">
+    <a class="imgdl" id="ddl" href="#" download="tangkung-fuel.png">⬇️ ดาวน์โหลดรูป</a>
+    <div class="capbox">
+      <h3>📝 Caption</h3>
+      <pre id="dcap">กำลังโหลด…</pre>
+      <button onclick="copyCap()">คัดลอก Caption</button>
+    </div>
+  </div>
+</div>
+<script>
+const THM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function thd(iso){ if(!iso) return '–'; const [y,m,d]=iso.split('-').map(Number);
+  return `${d} ${THM[m-1]} ${(y+543)%100}`; }
+const SCN={G1:'🟢 รีบเติมเต็มถังเลย',G2:'🟢 เติมเต็มถังได้',Y:'🟡 เติมตามปกติ',R1:'🔴 เติมแค่พอใช้',R2:'🔴 ยังไม่ต้องเต็มถัง'};
+let items=[];
+async function load(){
+  try{
+    items = await (await fetch('posts/index.json')).json();
+  }catch(e){ items=[]; }
+  const g = document.getElementById('grid');
+  if(!items.length){ g.innerHTML='<div class="empty">ยังไม่มีโพสต์เก่า</div>'; return; }
+  g.innerHTML = items.map((r,i)=>{
+    const cls = r.scenario ? r.scenario[0] : 'Y';
+    return `<div class="card" onclick="openPost(${i})">
+      <img loading="lazy" src="posts/${r.dir}/post.png" alt="${thd(r.post_date)}">
+      <div class="meta"><div class="d">${thd(r.post_date)}</div>
+      <div class="t">⛽ ${Number(r.g95).toFixed(2)} บาท/ลิตร</div>
+      <span class="sc ${cls}">${SCN[r.scenario]||r.title||''}</span></div>
+    </div>`;
+  }).join('');
+}
+function openPost(i){
+  const r = items[i];
+  document.getElementById('list').style.display='none';
+  const d = document.getElementById('detail'); d.style.display='block';
+  document.getElementById('dtitle').textContent = 'โพสต์วันที่ ' + thd(r.post_date);
+  document.getElementById('dsub').textContent = `${r.title||''} • ปั๊ม ${thd(r.date)} • ${Number(r.g95).toFixed(2)} บาท/ลิตร`;
+  document.getElementById('dimg').src = `posts/${r.dir}/post.png`;
+  document.getElementById('ddl').href = `posts/${r.dir}/post.png`;
+  document.getElementById('dcap').textContent = 'กำลังโหลด…';
+  fetch(`posts/${r.dir}/caption.txt`).then(x=>x.text()).then(t=>{
+    document.getElementById('dcap').textContent = t;
+  }).catch(()=>{ document.getElementById('dcap').textContent='โหลด caption ไม่ได้'; });
+  window.scrollTo(0,0);
+}
+function back(){
+  document.getElementById('detail').style.display='none';
+  document.getElementById('list').style.display='block';
+}
+function copyCap(){
+  const t = document.getElementById('dcap').textContent;
+  navigator.clipboard.writeText(t).then(()=>alert('คัดลอก caption แล้ว ✅'));
+}
+load();
+</script>
+</body>
+</html>
