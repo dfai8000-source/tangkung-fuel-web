@@ -67,8 +67,17 @@
       </div>
       <div class="tlegend" id="tlegend">กำลังโหลด…</div>
     </div>
+    <div class="tfrow">
+      <div class="tfbtns" id="bbbtns">
+        <button id="bbToggle" class="on">Bollinger</button>
+        <button data-lb="20">20</button>
+        <button data-lb="30">30</button>
+        <button data-lb="60" class="on">60</button>
+      </div>
+      <div class="tfbtns"><button id="maToggle" class="on">MA30</button></div>
+    </div>
     <div id="tvchart"></div>
-    <div class="chartnote">แตะ/ลากบนกราฟเพื่อดูราคาแต่ละวัน • เส้นประ = ค่าเฉลี่ย 30 วัน (MA30) • ที่มา: บางจาก</div>
+    <div class="chartnote">แตะ/ลากบนกราฟเพื่อดูราคาแต่ละวัน • เส้นประทอง = MA30 • Bollinger: เส้นทึบเทา = 2SD, เส้นประอ่อน = 1SD • ที่มา: บางจาก</div>
   </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <script>
@@ -91,15 +100,51 @@
   });
   const area=chart.addAreaSeries({title:'กส 95',lineColor:'#E2AE3D',lineWidth:2,
     topColor:'rgba(226,174,61,0.35)',bottomColor:'rgba(226,174,61,0.03)'});
-  const ma=chart.addLineSeries({title:'MA30',color:'#8D6E63',lineWidth:1,
+  const ma30=chart.addLineSeries({title:'MA30',color:'#8D6E63',lineWidth:1,
     lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
-  let full=[];
-  function showLast(){const l=full[full.length-1];
-    leg.innerHTML='กส 95 <b>'+fval(l.p)+'</b> • MA30 <b>'+fval(l.m)+'</b> • '+fdate(l.t);}
+  const bbMid=chart.addLineSeries({title:'BB mid',color:'#5D4037',lineWidth:1,
+    priceLineVisible:false,lastValueVisible:false});
+  const bbU2=chart.addLineSeries({title:'BB 2SD+',color:'#7E97A6',lineWidth:1,
+    priceLineVisible:false,lastValueVisible:false});
+  const bbL2=chart.addLineSeries({title:'BB 2SD-',color:'#7E97A6',lineWidth:1,
+    priceLineVisible:false,lastValueVisible:false});
+  const bbU1=chart.addLineSeries({title:'BB 1SD+',color:'#B9C9D2',lineWidth:1,
+    lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+  const bbL1=chart.addLineSeries({title:'BB 1SD-',color:'#B9C9D2',lineWidth:1,
+    lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+  const BB=[bbMid,bbU2,bbL2,bbU1,bbL1];
+  let full=[], bbN=60, bb={u2:[],u1:[],mid:[],l1:[],l2:[]}, bbOn=true, maOn=true, curDays=365;
+  function computeBB(n){
+    bbN=n; const u2=[],u1=[],mid=[],l1=[],l2=[];
+    let s=0,s2=0;
+    for(let i=0;i<full.length;i++){
+      const v=full[i].p; s+=v; s2+=v*v;
+      if(i>=n){const o=full[i-n].p; s-=o; s2-=o*o;}
+      if(i>=n-1){
+        const m=s/n, sd=Math.sqrt(Math.max(0,s2/n-m*m));
+        mid.push({time:full[i].t,value:m});
+        u1.push({time:full[i].t,value:m+sd}); l1.push({time:full[i].t,value:m-sd});
+        u2.push({time:full[i].t,value:m+2*sd}); l2.push({time:full[i].t,value:m-2*sd});
+      }
+    }
+    bb={u2:u2,u1:u1,mid:mid,l1:l1,l2:l2};
+  }
+  function bbRangeText(u,l){return 'BB'+bbN+' 2SD <b>'+fval(l)+'–'+fval(u)+'</b>';}
+  function showLast(){
+    const l=full[full.length-1];
+    let h='กส 95 <b>'+fval(l.p)+'</b>';
+    if(maOn)h+=' • MA30 <b>'+fval(l.m)+'</b>';
+    if(bbOn)h+=' • '+bbRangeText(bb.u2[bb.u2.length-1].value,bb.l2[bb.l2.length-1].value);
+    leg.innerHTML=h+' • '+fdate(l.t);
+  }
   function setRange(days){
+    curDays=days;
     const w=days>0?full.slice(-days):full.slice();
+    const bsl=function(a){return days>0?a.slice(-days):a.slice();};
     area.setData(w.map(function(r){return {time:r.t,value:r.p};}));
-    ma.setData(w.map(function(r){return {time:r.t,value:r.m};}));
+    ma30.setData(w.map(function(r){return {time:r.t,value:r.m};}));
+    bbMid.setData(bsl(bb.mid)); bbU2.setData(bsl(bb.u2)); bbL2.setData(bsl(bb.l2));
+    bbU1.setData(bsl(bb.u1)); bbL1.setData(bsl(bb.l1));
     let hi=w[0],lo=w[0];
     w.forEach(function(r){if(r.p>hi.p)hi=r;if(r.p<lo.p)lo=r;});
     area.setMarkers([
@@ -110,17 +155,37 @@
   }
   chart.subscribeCrosshairMove(function(p){
     if(!p||!p.time||!p.seriesData){showLast();return;}
-    const a=p.seriesData.get(area), m=p.seriesData.get(ma);
-    leg.innerHTML='กส 95 <b>'+fval(a&&a.value)+'</b> • MA30 <b>'+fval(m&&m.value)+'</b> • '+fdate(p.time);
+    const a=p.seriesData.get(area), m=p.seriesData.get(ma30);
+    let h='กส 95 <b>'+fval(a&&a.value)+'</b>';
+    if(maOn)h+=' • MA30 <b>'+fval(m&&m.value)+'</b>';
+    if(bbOn){
+      const u=p.seriesData.get(bbU2), l=p.seriesData.get(bbL2);
+      h+=' • '+bbRangeText(u&&u.value,l&&l.value);
+    }
+    leg.innerHTML=h+' • '+fdate(p.time);
   });
   document.getElementById('tfbtns').addEventListener('click',function(e){
     const b=e.target.closest('button'); if(!b)return;
     document.querySelectorAll('#tfbtns button').forEach(function(x){x.classList.remove('on');});
     b.classList.add('on'); setRange(parseInt(b.dataset.days,10));
   });
+  document.getElementById('bbToggle').addEventListener('click',function(){
+    bbOn=!bbOn; this.classList.toggle('on',bbOn);
+    BB.forEach(function(s){s.applyOptions({visible:bbOn});}); showLast();
+  });
+  document.getElementById('maToggle').addEventListener('click',function(){
+    maOn=!maOn; this.classList.toggle('on',maOn);
+    ma30.applyOptions({visible:maOn}); showLast();
+  });
+  document.getElementById('bbbtns').addEventListener('click',function(e){
+    const b=e.target.closest('button'); if(!b||!b.dataset.lb)return;
+    document.querySelectorAll('#bbbtns [data-lb]').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on'); computeBB(parseInt(b.dataset.lb,10)); setRange(curDays);
+  });
   new ResizeObserver(function(){chart.applyOptions({width:el.clientWidth});}).observe(el);
-  fetch('data/chart_full.json').then(function(r){return r.json();}).then(function(j){full=j;setRange(365);})
-    .catch(function(){leg.textContent='โหลดข้อมูลกราฟไม่ได้';});
+  fetch('data/chart_full.json').then(function(r){return r.json();}).then(function(j){
+    full=j; computeBB(60); setRange(365);
+  }).catch(function(){leg.textContent='โหลดข้อมูลกราฟไม่ได้';});
 })();
 </script>
 
