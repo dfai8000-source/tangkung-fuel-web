@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>✏️ ปรับข้อความ — ตังคุง Daily</title>
+<style>
+  :root{--cream:#FFF8E7;--brown:#3E2723;--gold:#E2AE3D;--muted:#8D6E63;--line:#EAD9AE}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,'Leelawadee UI','Segoe UI',Tahoma,sans-serif;background:var(--cream);color:var(--brown);margin:0;padding:0}
+  .wrap{max-width:640px;margin:0 auto;padding:16px}
+  nav{display:flex;gap:8px;padding:12px 16px;background:var(--brown);position:sticky;top:0;z-index:10;overflow-x:auto}
+  nav a{color:#FFE9B8;text-decoration:none;font-size:14px;font-weight:bold;padding:8px 14px;border-radius:20px;white-space:nowrap}
+  nav a.on{background:var(--gold);color:var(--brown)}
+  h1{font-size:22px;margin:14px 0 4px}
+  .intro{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:14px}
+  h2{font-size:17px;margin:22px 0 10px;padding-top:14px;border-top:2px solid var(--line)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+  .card h3{margin:0 0 6px;font-size:16px}
+  label{font-size:13px;color:var(--muted);display:block;margin:10px 0 4px}
+  input[type=text],textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px;font-family:inherit;background:var(--cream);color:var(--brown)}
+  textarea{min-height:110px;line-height:1.6}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px}
+  .mascrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .masc{border:2px solid var(--line);border-radius:12px;padding:6px;cursor:pointer;text-align:center;background:var(--cream)}
+  .masc.sel{border-color:var(--gold);background:#FFF3D6}
+  .masc img{width:64px;height:64px;object-fit:contain;display:block}
+  .masc small{font-size:10px;color:var(--muted)}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+  .tabs button{width:auto;margin:0;padding:8px 12px;font-size:13px}
+  .tabs button.on{background:var(--gold);color:var(--brown)}
+  .pv-banner{border-radius:16px;padding:18px 16px;display:flex;gap:14px;align-items:center;color:#fff;margin-bottom:10px}
+  .pv-banner img{width:84px;height:84px;object-fit:contain;flex:none}
+  .pv-title{font-size:24px;font-weight:bold;line-height:1.3}
+  .pv-sub{font-size:14px;opacity:.95;margin-top:6px;line-height:1.5}
+  .pv-footer{background:var(--brown);color:#FFE9B8;border-radius:10px;padding:12px;font-size:13px;text-align:center;line-height:1.6}
+  button{background:var(--brown);color:#fff;border:0;border-radius:12px;padding:13px 18px;font-size:15px;font-weight:bold;width:100%;margin-top:10px;cursor:pointer}
+  button:active{transform:scale(.98)}
+  button.ghost{background:#fff;color:var(--brown);border:1px solid var(--line)}
+  .steps{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:14px;line-height:2;margin-top:12px}
+  .steps b{color:var(--brown)}
+  .warn{background:#FFF3D6;border:1px solid var(--gold);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.7;margin-top:12px}
+  .err{background:#FFEBEE;border:1px solid #C62828;border-radius:12px;padding:14px;font-size:14px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html">📮 โพสต์วันนี้</a>
+  <a href="history.html">🗂️ คลังโพสต์</a>
+  <a href="data.html">🔧 หลังบ้าน</a>
+  <a href="admin.html" class="on">✏️ ปรับข้อความ</a>
+</nav>
+<div class="wrap">
+<h1>✏️ ปรับข้อความบนรูป</h1>
+<p class="intro">ข้อความบนรูปโพสต์มาจากไฟล์ตั้งค่ากลาง ไม่ได้ฝังตายในโค้ด — แก้ตรงนี้แล้วส่งขึ้น GitHub จะมีผลกับรูปที่ระบบ render ในรอบ 19:20 ถัดไปโดยอัตโนมัติ</p>
+<div id="app"><p class="intro">กำลังโหลดค่าปัจจุบัน…</p></div>
+</div>
+
+<script>
+const ORDER=['G1','G2','Y','R1','R2'];
+const NAMES={G1:'🟢 รีบเติมเต็มถัง <small>(Brent พุ่งแรง)</small>',G2:'🟢 เติมเต็มถังได้ <small>(โซนถูก)</small>',Y:'🟡 เติมตามปกติ <small>(กลางกรอบ)</small>',R1:'🔴 เติมแค่พอใช้ <small>(Brent ร่วงแรง)</small>',R2:'🔴 ยังไม่ต้องเต็มถัง <small>(โซนแพง)</small>'};
+const COLORS={G1:'#1a6c38',G2:'#1a6c38',Y:'#d99a2b',R1:'#c6151e',R2:'#c6151e'};
+const EDIT_URL='https://github.com/dfai8000-source/tangkung-fuel-web/edit/master/config/texts.json';
+let CFG=null, PV='R2';
+
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+async function init(){
+  try{
+    CFG = await (await fetch('config/texts.json')).json();
+  }catch(e){
+    document.getElementById('app').innerHTML='<div class="err">โหลดไฟล์ตั้งค่าไม่ได้ — ลองรีเฟรชหน้านี้อีกครั้ง</div>';
+    return;
+  }
+  buildForm();
+  buildTabs();
+  updatePreview();
+}
+
+function buildForm(){
+  const avail = CFG.mascots_available || [];
+  let h='<h2>จุดที่ 1 — 📝 ข้อความตามสถานการณ์</h2>';
+  for(const code of ORDER){
+    const s=CFG.scenarios[code];
+    h+=`<div class="card"><h3>${NAMES[code]}</h3>
+      <label>พาดหัวบนรูป</label>
+      <input type="text" data-k="${code}.title" value="${esc(s.title)}">
+      <label>บรรทัดอธิบายที่ 1</label>
+      <input type="text" data-k="${code}.sub1" value="${esc(s.sub1)}">
+      <label>บรรทัดอธิบายที่ 2</label>
+      <input type="text" data-k="${code}.sub2" value="${esc(s.sub2)}">
+      <label>Caption สำหรับโพสต์</label>
+      <textarea data-k="${code}.caption">${esc(s.caption)}</textarea>
+      <div class="hint">ใน caption ใช้ {date} {r5} {price} {zone} แทนค่าวันที่/ตัวเลขจริงได้</div>
+    </div>`;
+  }
+  h+='<h2>จุดที่ 2 — 🪙 Mascot ประจำสถานการณ์</h2>';
+  h+='<p class="intro">เลือกท่า Coiny ของแต่ละสถานการณ์ได้เลย — ถ้ามีท่าใหม่อยากเพิ่ม ส่งรูปมาให้ผม ผมจะอัปโหลดเข้าระบบให้ แล้วจะโผล่มาให้เลือกตรงนี้เอง</p>';
+  for(const code of ORDER){
+    const s=CFG.scenarios[code];
+    h+=`<div class="card"><h3>${NAMES[code]}</h3><div class="mascrow">`;
+    for(const m of avail){
+      const sel = s.mascot===m ? ' sel':'';
+      h+=`<div class="masc${sel}" data-masc="${code}|||${m}"><img src="assets/mascots/${m}" alt=""><small>${m.replace('coiny_','').replace('.png','')}</small></div>`;
+    }
+    h+='</div></div>';
+  }
+  h+=`<h2>จุดที่ 3 — 📊 แถบล่าง + ที่มาข้อมูล</h2>
+    <div class="card">
+      <label>ข้อความแถบสีน้ำตาลท้ายรูป</label>
+      <textarea data-k="footer" style="min-height:70px">${esc(CFG.footer)}</textarea>
+      <div class="hint">เช่น ใส่ที่มาข้อมูล: บางจาก, Yahoo Finance — และย้ำว่าไม่ใช่คำทำนาย</div>
+    </div>`;
+  h+=`<h2>👀 ตัวอย่าง</h2><div class="tabs" id="pvtabs"></div>
+    <div id="pv"></div>`;
+  h+=`<h2>💾 บันทึก</h2>
+    <button onclick="copyJSON()">📋 1. คัดลอก JSON ที่แก้แล้ว</button>
+    <button class="ghost" onclick="window.open(EDIT_URL,'_blank')">🔗 2. เปิดหน้าแก้ไขไฟล์บน GitHub</button>
+    <div class="steps">
+      <b>ขั้นตอน:</b><br>
+      1️⃣ กดปุ่มคัดลอกด้านบน<br>
+      2️⃣ กดปุ่มเปิดหน้า GitHub → ล็อกอินถ้าถาม<br>
+      3️⃣ ลบข้อความเก่าทั้งหมด วางข้อความใหม่ทับ → กด <b>Commit changes</b><br>
+      4️⃣ รอ ~1–2 นาที Vercel จะ deploy ใหม่เอง — ค่ากลับมาดูหน้านี้อีกครั้งจะเห็นค่าที่แก้
+    </div>
+    <div class="warn">⏰ ข้อความใหม่จะมีผลกับ<b>รูปที่ render รอบ 19:20 ถัดไป</b><br>
+    ถ้าอยากให้รูปของ<b>วันนี้</b>เปลี่ยนทันที บอกผมในแชตว่า "render รูปวันนี้ใหม่" ผมจัดการให้</div>`;
+  document.getElementById('app').innerHTML=h;
+
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    el.addEventListener('input',()=>{
+      const [a,b]=el.dataset.k.split('.');
+      if(b) CFG.scenarios[a][b]=el.value; else CFG[a]=el.value;
+      updatePreview();
+    });
+  });
+  document.querySelectorAll('[data-masc]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const [code,m]=el.dataset.masc.split('|||');
+      CFG.scenarios[code].mascot=m;
+      el.parentElement.querySelectorAll('.masc').forEach(x=>x.classList.remove('sel'));
+      el.classList.add('sel');
+      updatePreview();
+    });
+  });
+}
+
+function buildTabs(){
+  document.getElementById('pvtabs').innerHTML = ORDER.map(c=>
+    `<button data-pv="${c}" class="${c===PV?'on':''}">${c}</button>`).join('');
+  document.querySelectorAll('[data-pv]').forEach(b=>b.addEventListener('click',()=>{
+    PV=b.dataset.pv;
+    document.querySelectorAll('[data-pv]').forEach(x=>x.classList.toggle('on',x===b));
+    updatePreview();
+  }));
+}
+
+function updatePreview(){
+  const s=CFG.scenarios[PV];
+  document.getElementById('pv').innerHTML=`
+    <div class="pv-banner" style="background:${COLORS[PV]}">
+      <img src="assets/mascots/${s.mascot}" alt="">
+      <div><div class="pv-title">${esc(s.title)}</div>
+      <div class="pv-sub">${esc(s.sub1)}<br>${esc(s.sub2)}</div></div>
+    </div>
+    <div class="pv-footer">${esc(CFG.footer)}</div>`;
+}
+
+function copyJSON(){
+  navigator.clipboard.writeText(JSON.stringify(CFG,null,1))
+    .then(()=>alert('คัดลอก JSON แล้ว ✅ เปิดหน้า GitHub แล้ววางทับได้เลย'));
+}
+init();
+</script>
+</body>
+</html>
