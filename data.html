@@ -56,8 +56,14 @@
   <h2>สถานะ pipeline</h2>
   <div class="card" id="statuscard"><div class="sub">กำลังโหลด…</div></div>
 
-  <h2>ราคาแก๊สโซฮอล์ 95 ย้อนหลัง</h2>
+  <h2 id="chartTitle">ราคาแก๊สโซฮอล์ 95 ย้อนหลัง</h2>
   <div class="card">
+    <div class="tfrow">
+      <div class="tfbtns" id="dsbtns">
+        <button data-ds="g95" class="on">โซฮอล 95</button>
+        <button data-ds="brent">Brent</button>
+      </div>
+    </div>
     <div class="tfrow">
       <div class="tfbtns" id="tfbtns">
         <button data-days="90">3M</button>
@@ -77,16 +83,25 @@
       <div class="tfbtns"><button id="maToggle">MA30</button></div>
     </div>
     <div id="tvchart"></div>
-    <div class="chartnote">แตะ/ลากบนกราฟเพื่อดูราคาแต่ละวัน • เส้นประทอง = MA30 • Bollinger: เส้นทึบเทา = 2SD, เส้นประอ่อน = 1SD • ที่มา: บางจาก</div>
+    <div class="chartnote" id="chartNote">แตะ/ลากบนกราฟเพื่อดูราคาแต่ละวัน • เส้นประน้ำตาล = MA30 • Bollinger: เส้นทึบเทา = 2SD, เส้นประอ่อน = 1SD • ที่มา: บางจาก</div>
   </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <script>
 (function(){
   const el=document.getElementById('tvchart'), leg=document.getElementById('tlegend');
+  const titleEl=document.getElementById('chartTitle'), noteEl=document.getElementById('chartNote');
   const THM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   function fdate(iso){const p=iso.split('-').map(Number);return p[2]+' '+THM[p[1]-1]+' '+((p[0]+543)%100);}
   function fval(v){return (v==null||v===undefined)?'–':v.toFixed(2);}
   if(!window.LightweightCharts){leg.textContent='โหลดไลบรารีกราฟไม่สำเร็จ (ต้องต่ออินเทอร์เน็ต)';return;}
+  const DS={
+    g95:{file:'data/chart_full.json',name:'กส 95',title:'ราคาแก๊สโซฮอล์ 95 ย้อนหลัง',
+      note:'แตะ/ลากบนกราฟเพื่อดูราคาแต่ละวัน • เส้นประน้ำตาล = MA30 • Bollinger: เส้นทึบเทา = 2SD, เส้นประอ่อน = 1SD • ที่มา: บางจาก',
+      data:null},
+    brent:{file:'data/brent_full.json',name:'Brent',title:'ราคา Brent ย้อนหลัง (ดอลลาร์/บาร์เรล)',
+      note:'แตะ/ลากบนกราฟเพื่อดูราคาแต่ละวัน • เส้นประน้ำตาล = MA30 • Bollinger: เส้นทึบเทา = 2SD, เส้นประอ่อน = 1SD • ที่มา: Yahoo Finance (BZ=F)',
+      data:null}
+  };
   const chart=LightweightCharts.createChart(el,{
     width:el.clientWidth, height:el.clientHeight||420,
     layout:{background:{type:'solid',color:'#ffffff'},textColor:'#8D6E63',fontSize:12,
@@ -98,7 +113,7 @@
     rightPriceScale:{borderColor:'#EAD9AE'},
     timeScale:{borderColor:'#EAD9AE',timeVisible:false,tickMarkFormatter:function(t){return fdate(t);}}
   });
-  const area=chart.addAreaSeries({title:'กส 95',lineColor:'#E2AE3D',lineWidth:2,
+  const area=chart.addAreaSeries({title:'price',lineColor:'#E2AE3D',lineWidth:2,
     topColor:'rgba(226,174,61,0.35)',bottomColor:'rgba(226,174,61,0.03)'});
   const ma30=chart.addLineSeries({title:'MA30',color:'#8D6E63',lineWidth:1,visible:false,
     lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
@@ -113,7 +128,7 @@
   const bbL1=chart.addLineSeries({title:'BB 1SD-',color:'#B9C9D2',lineWidth:1,
     lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
   const BB=[bbMid,bbU2,bbL2,bbU1,bbL1];
-  let full=[], bbN=60, bb={u2:[],u1:[],mid:[],l1:[],l2:[]}, bbOn=true, maOn=false, curDays=365;
+  let ds='g95', full=[], bbN=60, bb={u2:[],u1:[],mid:[],l1:[],l2:[]}, bbOn=true, maOn=false, curDays=365;
   function computeBB(n){
     bbN=n; const u2=[],u1=[],mid=[],l1=[],l2=[];
     let s=0,s2=0;
@@ -132,7 +147,7 @@
   function bbRangeText(u,l){return 'BB'+bbN+' 2SD <b>'+fval(l)+'–'+fval(u)+'</b>';}
   function showLast(){
     const l=full[full.length-1];
-    let h='กส 95 <b>'+fval(l.p)+'</b>';
+    let h=DS[ds].name+' <b>'+fval(l.p)+'</b>';
     if(maOn)h+=' • MA30 <b>'+fval(l.m)+'</b>';
     if(bbOn)h+=' • '+bbRangeText(bb.u2[bb.u2.length-1].value,bb.l2[bb.l2.length-1].value);
     leg.innerHTML=h+' • '+fdate(l.t);
@@ -153,16 +168,32 @@
     ]);
     chart.timeScale().fitContent(); showLast();
   }
+  function activate(key){
+    ds=key; full=DS[key].data;
+    titleEl.textContent=DS[key].title; noteEl.textContent=DS[key].note;
+    document.querySelectorAll('#dsbtns button').forEach(function(x){
+      x.classList.toggle('on',x.dataset.ds===key);});
+    computeBB(bbN); setRange(curDays);
+  }
   chart.subscribeCrosshairMove(function(p){
     if(!p||!p.time||!p.seriesData){showLast();return;}
     const a=p.seriesData.get(area), m=p.seriesData.get(ma30);
-    let h='กส 95 <b>'+fval(a&&a.value)+'</b>';
+    let h=DS[ds].name+' <b>'+fval(a&&a.value)+'</b>';
     if(maOn)h+=' • MA30 <b>'+fval(m&&m.value)+'</b>';
     if(bbOn){
       const u=p.seriesData.get(bbU2), l=p.seriesData.get(bbL2);
       h+=' • '+bbRangeText(u&&u.value,l&&l.value);
     }
     leg.innerHTML=h+' • '+fdate(p.time);
+  });
+  document.getElementById('dsbtns').addEventListener('click',function(e){
+    const b=e.target.closest('button'); if(!b||b.dataset.ds===ds)return;
+    const key=b.dataset.ds;
+    if(DS[key].data){activate(key);return;}
+    leg.textContent='กำลังโหลด…';
+    fetch(DS[key].file).then(function(r){return r.json();}).then(function(j){
+      DS[key].data=j; activate(key);
+    }).catch(function(){leg.textContent='โหลดข้อมูลกราฟไม่ได้';});
   });
   document.getElementById('tfbtns').addEventListener('click',function(e){
     const b=e.target.closest('button'); if(!b)return;
@@ -183,8 +214,8 @@
     b.classList.add('on'); computeBB(parseInt(b.dataset.lb,10)); setRange(curDays);
   });
   new ResizeObserver(function(){chart.applyOptions({width:el.clientWidth});}).observe(el);
-  fetch('data/chart_full.json').then(function(r){return r.json();}).then(function(j){
-    full=j; computeBB(60); setRange(365);
+  fetch(DS.g95.file).then(function(r){return r.json();}).then(function(j){
+    DS.g95.data=j; activate('g95');
   }).catch(function(){leg.textContent='โหลดข้อมูลกราฟไม่ได้';});
 })();
 </script>
@@ -195,10 +226,26 @@
     <tbody id="tbody"><tr><td colspan="3" style="text-align:center;color:var(--muted)">กำลังโหลด…</td></tr></tbody>
   </table>
 
+  <h2>Brent ขยับ → ปั๊มขยับตามแค่ไหน</h2>
+  <div class="card">
+    <div class="sub" style="margin-bottom:10px">Backtest 2007–2026: ทุกครั้งที่ Brent ขยับ ±4% ใน 5 วัน ราคาปั๊มโซฮอล 95 ขยับตามจริงกี่ครั้ง</div>
+    <table>
+      <thead><tr><th></th><th>Brent พุ่ง &gt; +4%</th><th>Brent ร่วง &lt; −4%</th></tr></thead>
+      <tbody>
+        <tr><td>จำนวนสัญญาณ</td><td>349 ครั้ง</td><td>306 ครั้ง</td></tr>
+        <tr><td>ปั๊มขยับตามใน 3 วัน</td><td>46.4%</td><td>49.3%</td></tr>
+        <tr><td>ปั๊มขยับตามใน 5 วัน</td><td>59.9%</td><td>60.8%</td></tr>
+        <tr><td>นำหน้ากลาง (median)</td><td>2 วัน</td><td>2 วัน</td></tr>
+        <tr><td>ขนาดขยับกลาง</td><td>+0.50 บ./ล.</td><td>−0.50 บ./ล.</td></tr>
+      </tbody>
+    </table>
+    <div class="chartnote">วิธี: สัญญาณจากแท่ง Brent ที่ปิดแล้ว (5-session return ±4%) เว้น 3 วันทำการระหว่างสัญญาณ เทียบราคาปั๊มเป็นวันปฏิทิน • แม่น ~60% ไม่ใช่คำทำนาย</div>
+  </div>
+
   <h2>หลังบ้านทำงานอย่างไร</h2>
   <div class="howto">
     <div class="step"><div class="t">🕖 19:00 — กวาดราคาปั๊ม</div>ดึงราคาหน้าปั๊มจากเว็บ<b>บางจาก</b> (ข้อมูลสาธารณะ) บันทึกลงฐานข้อมูล ถ้าดึงไม่ได้จะลองใหม่แล้วแจ้งเตือน</div>
-    <div class="step"><div class="t">🕢 19:20 — คำนวณ + สร้างโพสต์</div>ดึงราคา <b>Brent</b> จาก Yahoo Finance แล้วคำนวณสัญญาณ 5 วัน วาดรูป 1080×1080 เขียน caption 5 แบบตาม scenario อัปโหลดขึ้นเว็บนี้อัตโนมัติ</div>
+    <div class="step"><div class="t">🕢 19:05 — คำนวณ + สร้างโพสต์</div>ดึงราคา <b>Brent</b> จาก Yahoo Finance แล้วคำนวณสัญญาณ 5 วัน วาดรูป 1080×1080 เขียน caption 5 แบบตาม scenario อัปโหลดขึ้นเว็บนี้อัตโนมัติ</div>
     <div class="step"><div class="t">🕗 20:00 — เฝ้ามาตรการรัฐ</div>ตรวจข่าวกองทุนน้ำมัน/มาตรการรัฐ ถ้ามีแววลดราคาจะร่าง alert ให้อนุมัติก่อนราคามีผลตี 5</div>
     <div class="step"><div class="t">📱 หน้าที่ของ Earth</div><b>เปิดเว็บนี้ทุกเย็น</b> → ดาวน์โหลดรูป → คัดลอก caption → โพสต์ลงเพจ แค่นั้น ที่เหลือระบบจัดการเอง</div>
   </div>
