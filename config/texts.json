@@ -45,5 +45,10 @@
     "coiny_Y.png",
     "coiny_R1.png",
     "coiny_R2.png"
-  ]
+  ],
+  "brent_paused_note": "⚠️ Brent อยู่ช่วงเปลี่ยนสัญญา futures ({roll_day}) — เลข 5 วัน {r5} มีแท่งกลไกปนอยู่ วันนี้งดใช้สัญญาณ Brent ดูโซนราคาอย่างเดียว (เลขดิบตรงกับ Yahoo Finance)",
+  "brent_paused_card": {
+    "line1": "พักชั่วคราว",
+    "line2": "แท่งเปลี่ยนสัญญาปนอยู่"
+  }
 }
