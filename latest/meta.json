@@ -11,6 +11,8 @@
  "ma30": 39.43,
  "brent_paused": false,
  "roll_days": [],
- "image": "daily_post_20261002.png",
+ "ve_blocked": false,
+ "r5_prev": 0.0044,
+ "image": "today_verify.png",
  "caption": "caption_20261002.txt"
 }
