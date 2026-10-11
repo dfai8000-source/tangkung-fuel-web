@@ -1,6 +1,6 @@
 {
  "date": "2026-10-09",
- "post_date": "2026-10-11",
+ "post_date": "2026-10-12",
  "scenario": "R2",
  "title": "ยังไม่ต้องเติมเต็มถังก็ได้",
  "g95": 41.44,
@@ -9,10 +9,8 @@
  "brent_asof": "2026-10-09",
  "brent_close": 104.72,
  "ma30": 39.99,
- "brent_paused": true,
- "roll_days": [
-  "2026-10-08"
- ],
+ "brent_paused": false,
+ "roll_days": [],
  "ve_blocked": false,
  "r5_prev": 0.0191,
  "image": "daily_post_20261009.png",
