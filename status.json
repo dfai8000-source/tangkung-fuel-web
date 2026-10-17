@@ -1,11 +1,11 @@
 {
- "updated_at": "2026-10-17 06:15",
+ "updated_at": "2026-10-18 06:15",
  "pump_date": "2026-10-09",
  "brent_asof": "2026-10-16",
- "brent_close": 109.69,
+ "brent_close": 109.86,
  "scenario": "G1",
  "title": "เตรียมไปเติมเลย",
  "g95": 41.44,
  "ok": true,
- "push_ok": true
+ "push_ok": null
 }
