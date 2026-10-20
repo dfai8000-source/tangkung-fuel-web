@@ -1,0 +1,18 @@
+{
+ "date": "2026-10-21",
+ "post_date": "2026-10-21",
+ "scenario": "R2",
+ "title": "ยังไม่ต้องเติมเต็มถังก็ได้",
+ "g95": 42.04,
+ "zone": "แพงสุดในรอบ 30 วัน",
+ "brent_r5": 0.0319,
+ "brent_asof": "2026-10-20",
+ "brent_close": 109.12,
+ "ma30": 40.76,
+ "brent_paused": false,
+ "roll_days": [],
+ "ve_blocked": false,
+ "r5_prev": 0.0268,
+ "image": "daily_post_20261021.png",
+ "caption": "caption_20261021.txt"
+}
