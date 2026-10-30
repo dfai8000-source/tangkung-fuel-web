@@ -1,20 +1,18 @@
 {
  "date": "2026-10-29",
- "post_date": "2026-10-30",
+ "post_date": "2026-10-31",
  "scenario": "R2",
  "title": "ยังไม่ต้องเติมเต็มถังก็ได้",
  "g95": 41.54,
  "zone": "โซนแพง",
- "brent_r5": -0.015,
- "brent_asof": "2026-10-29",
- "brent_close": 111.48,
+ "brent_r5": -0.0383,
+ "brent_asof": "2026-10-30",
+ "brent_close": 112.33,
  "ma30": 41.28,
- "brent_paused": true,
- "roll_days": [
-  "2026-10-29"
- ],
+ "brent_paused": false,
+ "roll_days": [],
  "ve_blocked": false,
- "r5_prev": 0.058,
+ "r5_prev": 0.015,
  "image": "daily_post_20261029.png",
  "caption": "caption_20261029.txt"
 }
