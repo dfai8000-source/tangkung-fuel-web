@@ -1,0 +1,18 @@
+{
+ "date": "2026-11-06",
+ "post_date": "2026-11-06",
+ "scenario": "R1",
+ "title": "เติมแค่พอใช้",
+ "g95": 39.84,
+ "zone": "ถูกสุดในรอบ 30 วัน",
+ "brent_r5": -0.1479,
+ "brent_asof": "2026-11-05",
+ "brent_close": 99.09,
+ "ma30": 41.5,
+ "brent_paused": false,
+ "roll_days": [],
+ "ve_blocked": false,
+ "r5_prev": -0.1978,
+ "image": "daily_post_20261106.png",
+ "caption": "caption_20261106.txt"
+}
