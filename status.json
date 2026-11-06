@@ -1,11 +1,11 @@
 {
- "updated_at": "2026-11-06 06:13",
+ "updated_at": "2026-11-07 06:13",
  "pump_date": "2026-11-06",
- "brent_asof": "2026-11-05",
- "brent_close": 99.09,
+ "brent_asof": "2026-11-06",
+ "brent_close": 97.76,
  "scenario": "R1",
  "title": "เติมแค่พอใช้",
  "g95": 39.84,
  "ok": true,
- "push_ok": true
+ "push_ok": null
 }
