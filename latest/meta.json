@@ -1,18 +1,18 @@
 {
  "date": "2026-11-11",
- "post_date": "2026-11-12",
+ "post_date": "2026-11-13",
  "scenario": "G2",
  "title": "ลองเติมเต็มถังได้",
  "g95": 39.34,
  "zone": "ถูกสุดในรอบ 30 วัน",
- "brent_r5": -0.0227,
- "brent_asof": "2026-11-11",
- "brent_close": 92.5,
+ "brent_r5": -0.026,
+ "brent_asof": "2026-11-12",
+ "brent_close": 95.77,
  "ma30": 41.27,
  "brent_paused": false,
  "roll_days": [],
  "ve_blocked": false,
- "r5_prev": -0.1243,
+ "r5_prev": -0.0199,
  "image": "daily_post_20261111.png",
  "caption": "caption_20261111.txt"
 }
