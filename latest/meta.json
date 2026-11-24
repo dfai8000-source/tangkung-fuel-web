@@ -1,18 +1,18 @@
 {
- "date": "2026-11-20",
- "post_date": "2026-11-24",
+ "date": "2026-11-25",
+ "post_date": "2026-11-25",
  "scenario": "R1",
  "title": "เติมแค่พอใช้",
  "g95": 38.14,
  "zone": "ถูกสุดในรอบ 30 วัน",
- "brent_r5": -0.063,
- "brent_asof": "2026-11-23",
- "brent_close": 86.8,
- "ma30": 40.57,
+ "brent_r5": -0.0511,
+ "brent_asof": "2026-11-24",
+ "brent_close": 88.5,
+ "ma30": 39.94,
  "brent_paused": false,
  "roll_days": [],
  "ve_blocked": false,
- "r5_prev": -0.0347,
- "image": "daily_post_20261120.png",
- "caption": "caption_20261120.txt"
+ "r5_prev": -0.0338,
+ "image": "daily_post_20261125.png",
+ "caption": "caption_20261125.txt"
 }
