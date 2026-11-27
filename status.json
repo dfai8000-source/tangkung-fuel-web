@@ -1,11 +1,11 @@
 {
- "updated_at": "2026-11-27 06:13",
+ "updated_at": "2026-11-28 06:13",
  "pump_date": "2026-11-26",
- "brent_asof": "2026-11-25",
- "brent_close": 94.61,
+ "brent_asof": "2026-11-27",
+ "brent_close": 91.75,
  "scenario": "G2",
  "title": "ลองเติมเต็มถังได้",
  "g95": 37.44,
  "ok": true,
- "push_ok": true
+ "push_ok": null
 }
